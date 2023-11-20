@@ -16,3 +16,6 @@ Route::get('user', [LoginController::class, 'user'])
 
 Route::resource('notes', NoteController::class)
     ->middleware('auth:api');
+
+Route::post('notes/{id}', [NoteController::class, 'update'])
+    ->middleware('auth:api');

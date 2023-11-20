@@ -10,7 +10,6 @@ use App\Models\Note;
 use App\Services\Notes\NoteService;
 use App\Services\Users\UserService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class NoteController extends Controller
@@ -45,19 +44,33 @@ class NoteController extends Controller
     public function show(Note $note): JsonResponse
     {
         if (Auth::user()->id === $note->user_id || Auth::user()->is_admin) {
-            return response()->json(['note' => $note]);
+            return response()->json(['note' => NoteResource::make($note)]);
         }
 
-        return response()->json(['message' => 'note not found']);
+        return response()->json(['message' => 'Note not found']);
     }
 
-    public function update(Request $request, $id)
+    public function update(NoteUpsertRequest $request, Note $note)
     {
-        //
+        $data = $request->getData()->toArray();
+
+        if (Auth::user()->id === $note->user_id) {
+            return $this->noteService->update($data, $note)
+                ? response()->json(['message' => 'Note successfully updated'])
+                : response()->json(['message' => 'Error updating a note']);
+        }
+
+        return response()->json(['message' => 'Note not found']);
     }
 
-    public function destroy($id)
+    public function destroy(Note $note)
     {
-        //
+        if (Auth::user()->id === $note->user_id) {
+            return $this->noteService->destroy($note)
+                ? response()->json(['message' => 'Note successfully deleted'])
+                : response()->json(['message' => 'Error deleting a note']);
+        }
+
+        return response()->json(['message' => 'Note not found']);
     }
 }

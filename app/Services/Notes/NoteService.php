@@ -28,4 +28,14 @@ class NoteService
             'content' => $request->getData()->getContent(),
         ]);
     }
+
+    public function update(array $data, Note $note): bool
+    {
+        return $note->update($data);
+    }
+
+    public function destroy(Note $note): bool
+    {
+        return $note->delete();
+    }
 }
